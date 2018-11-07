@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# start torrent bot
+
+repository="TeleTor"
+path=$(pwd)
+
+if [[ -f ${path}/teletor.py ]]
+then
+    . ${path}/venv/bin/activate && nohup python ${path}/teletor.py &
+else
+    . ${path}/${repository}-master/venv/bin/activate && nohup python ${path}/${repository}-master/teletor.py &
+fi

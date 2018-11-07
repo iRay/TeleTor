@@ -1,0 +1,20 @@
+telegram_bot:
+  tg_endpoint: 'https://api.telegram.org'
+  token: ''
+
+auth:
+  id:
+  username: ''
+  first_name: ''
+  last_name: ''
+
+torrents:
+  files_dir: './files'
+  username: ''
+  password: ''
+  fetch_list: './scripts/fetch_list.sh'
+  fetch_ids: './scripts/fetch_ids.sh'
+  fetch_names: './scripts/fetch_names.sh'
+  start_torrent: './scripts/start_torrent.sh'
+  stop_torrent: './scripts/stop_torrent.sh'
+  delete_torrent: './scripts/delete_torrent.sh'

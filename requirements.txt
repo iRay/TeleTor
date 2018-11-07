@@ -1,0 +1,12 @@
+aiohttp==3.4.4
+async-timeout==3.0.1
+asyncpg==0.17.0
+attrs==18.2.0
+chardet==3.0.4
+idna==2.7
+multidict==4.4.2
+PyYAML==3.13
+telepot==12.7
+udatetime==0.0.16
+urllib3==1.24
+yarl==1.2.6

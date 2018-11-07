@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#
+# stop torrent bot
+
+kill $(ps -fu $USER | grep teletor.py | grep -v "grep" | awk '{print $2}')
