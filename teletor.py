@@ -38,7 +38,7 @@ class TorrentBot(telepot.aio.Bot):
             magnet_link = Command.create('magnet_link')
             if magnet_link.check_magnet_link(message) is not None:
                 subprocess.call(["transmission-remote", "-n",
-                                 f"{torrents['username']}:{torrents['password']}", "-a", message])
+                                 f"{torrents['t_username']}:{torrents['t_password']}", "-a", message])
                 await self.sendMessage(chat_id, "Link has been added to the queue")
                 return
 
@@ -55,7 +55,7 @@ class TorrentBot(telepot.aio.Bot):
             file_path = f"{torrents['files_dir']}/{file_name}"
             torrent_file.download(url=url, path=file_path)
             subprocess.call(["transmission-remote", "-n",
-                             f"{torrents['username']}:{torrents['password']}", "-a", file_path])
+                             f"{torrents['t_username']}:{torrents['t_password']}", "-a", file_path])
 
             await self.sendMessage(chat_id, f"Added to the queue: {file_name}")
             return
@@ -68,7 +68,7 @@ class TorrentBot(telepot.aio.Bot):
             path, is_writable = self.is_path_writable(download_dir[1])
             if is_writable:
                 subprocess.call(["transmission-remote", "-n",
-                                 f"{torrents['username']}:{torrents['password']}", "-w", path])
+                                 f"{torrents['t_username']}:{torrents['t_password']}", "-w", path])
                 await self.sendMessage(chat_id, 'New download directory has been set')
             else:
                 await self.sendMessage(chat_id, "Provided directory either isn't writable or doesn't exist\n"

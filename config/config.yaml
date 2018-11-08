@@ -20,3 +20,14 @@ torrents:
   start_torrent: './scripts/start_torrent.sh'
   stop_torrent: './scripts/stop_torrent.sh'
   delete_torrent: './scripts/delete_torrent.sh'
+
+# Favourites folders
+# i.e. F1 - alias that will be used in set command
+# e.g. If you send the next command to the bot:
+# set F1
+# then /mnt/HDD/Plex/Movies directory will be used
+# as a default directory for all next downloads
+favourites:
+  F1: '/mnt/HDD/Plex/Movies'
+  F2: ''
+  F3: ''
