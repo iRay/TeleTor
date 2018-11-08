@@ -10,7 +10,7 @@ from pathlib import Path
 from telepot import glance
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 
-from config import telegram_bot, torrents, auth
+from config import telegram_bot, torrents, auth, favourites
 from models.message import Command
 
 
@@ -64,12 +64,15 @@ class TorrentBot(telepot.aio.Bot):
             await self.send_torrents_list(chat_id=chat_id)
 
         if msg['text'].startswith('set'):
-            download_dir = re.compile('[:\s+,]').split(msg['text'].strip())
-            path, is_writable = self.is_path_writable(download_dir[1])
+            alias = re.compile('[:\s+,]').split(msg['text'].strip())
+            if alias[1] not in favourites:
+                return
+            download_dir = favourites[alias[1]]
+            path, is_writable = self.is_path_writable(download_dir)
             if is_writable:
                 subprocess.call(["transmission-remote", "-n",
                                  f"{torrents['t_username']}:{torrents['t_password']}", "-w", path])
-                await self.sendMessage(chat_id, 'New download directory has been set')
+                await self.sendMessage(chat_id, f"New favourite directory {alias[1]} has been set")
             else:
                 await self.sendMessage(chat_id, "Provided directory either isn't writable or doesn't exist\n"
                                                 "Try another one")

@@ -9,6 +9,7 @@ with open(default_file, 'r') as file:
 
 telegram_bot = config.get('telegram_bot')
 torrents = config.get('torrents')
+favourites = config.get('favourites')
 auth = config.get('auth')
 
 LOG_LEVEL_MAP = {
