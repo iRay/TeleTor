@@ -2,12 +2,20 @@
 #
 # start torrent bot
 
+start() {
 repository="TeleTor"
 path=$(pwd)
 
 if [[ -f ${path}/teletor.py ]]
 then
-    . ${path}/venv/bin/activate && nohup python ${path}/teletor.py &
+    run_bot
 else
-    . ${path}/${repository}-master/venv/bin/activate && nohup python ${path}/${repository}-master/teletor.py &
+    echo "Can't find teletor.py"
 fi
+}
+
+run_bot() {
+    (. ${path}/venv/bin/activate && nohup python ${path}/teletor.py &)
+}
+
+start

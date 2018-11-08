@@ -10,8 +10,8 @@ auth:
 
 torrents:
   files_dir: './files'
-  username: ''
-  password: ''
+  t_username: ''
+  t_password: ''
   fetch_list: './scripts/fetch_list.sh'
   fetch_ids: './scripts/fetch_ids.sh'
   fetch_names: './scripts/fetch_names.sh'

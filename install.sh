@@ -65,6 +65,9 @@ if [[ $(check_gui) ]]
         fi
 
         $(find $(pwd)/${repository}-master/scripts/ -type f -exec sed -i -e "s/username:password/${user_name}:${user_pass}/g" {} \;)
+        $(find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i '' "s/t_username: ''/t_username: '${user_name}'/g" {} \;)
+        $(find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i '' "s/t_username: ''/t_password: '${user_pass}'/g" {} \;)
+
         (chmod +x $(pwd)/${repository}-master/start_bot $(pwd)/${repository}-master/stop_bot)
         (chmod +x $(pwd)/${repository}-master/scripts/*)
         (chmod 777 $(pwd)/${repository}-master/files/)
@@ -77,14 +80,6 @@ if [[ $(check_gui) ]]
         (cd $(pwd)/${repository}-master && python3.7 -m venv $(pwd)/venv && . $(pwd)/venv/bin/activate && pip install -r requirements.txt)
 
         show_msg "Installation completed" "TeleTor"
-
-        if (whiptail --title  "TeleTor" --yesno  "Start your bot right now?" 10 60)
-        then
-            ($(pwd)/${repository}-master/start_bot)
-            show_msg "Your bot has been started!" "TeleTor"
-        fi
-
-
 }
 
 progress() {
