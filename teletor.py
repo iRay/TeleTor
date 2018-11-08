@@ -179,11 +179,8 @@ class TorrentBot(telepot.aio.Bot):
 
     @staticmethod
     def is_path_writable(path):
-        home = str(Path.home())
-        full_path = f"{home}/{path}"
-        st = os.stat(full_path)
-
-        return full_path, bool(st.st_mode & stat.S_IRGRP)
+        st = os.stat(path)
+        return path, bool(st.st_mode & stat.S_IRGRP)
 
     @staticmethod
     def all_torrents(action=None):

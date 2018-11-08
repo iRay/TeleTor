@@ -138,4 +138,20 @@ And finally start the bot:
 cd TeleTor-master/ && ./start_bot
 ```
 
+Also you can add favourite folder with alias
+Find it in favourites section of config.yaml
+<br />
+<br /><img src="https://www.dropbox.com/s/s7paxmrntj67s5c/teletor_09.png?raw=1" alt="TeleTor Telegram Bot" width="400"/>
+
+Sent the next command to the bot and `'/mnt/HDD/Plex/Movies'` will be used for all future downloads:
+```bash
+set F1
+```
+
+To change current download directory just sent new alias to the bot e.g.:
+
+```bash
+set F3
+```
+
 About transmission-remote you can read here: [TransmissionHowTo](https://help.ubuntu.com/community/TransmissionHowTo "TransmissionHowTo")
