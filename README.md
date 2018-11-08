@@ -123,8 +123,19 @@ curl https://api.telegram.org/bot<BOTID>/getUpdates | python -c 'import json, sy
 
 Put appropriate fields that you have received into auth section of `config/config.yaml` 
 So the bot will run commands that came only from you.
-
 <br />auth fields in config.yaml
 <br /><img src="https://www.dropbox.com/s/qs1oitwcxuekkfr/teletor_08.png?raw=1" alt="TeleTor Telegram Bot" width="400"/>
+
+```bash
+vim TeleTor-master/config/config.yaml
+```
+Edit config(press `i`)<br />
+Then `Esc`<br />
+Then `Shift+ZZ` to save and exit<br />
+
+And finally start the bot:
+```bash
+cd TeleTor-master/ && ./start_bot
+```
 
 About transmission-remote you can read here: [TransmissionHowTo](https://help.ubuntu.com/community/TransmissionHowTo "TransmissionHowTo")
