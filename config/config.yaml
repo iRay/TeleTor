@@ -12,6 +12,8 @@ torrents:
   files_dir: './files'
   t_username: ''
   t_password: ''
+  start_all: './scripts/start_all.sh'
+  stop_all: './scripts/stop_all.sh'
   fetch_list: './scripts/fetch_list.sh'
   fetch_ids: './scripts/fetch_ids.sh'
   fetch_names: './scripts/fetch_names.sh'

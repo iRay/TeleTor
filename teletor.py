@@ -79,6 +79,16 @@ class TorrentBot(telepot.aio.Bot):
             await self.sendMessage(chat_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
             return
 
+        if msg['text'] == '/start_all':
+            if self.all_torrents('start_all') is not None:
+                await self.sendMessage(chat_id, 'All torrents have been started')
+            return
+
+        if msg['text'] == '/stop_all':
+            if self.all_torrents('stop_all') is not None:
+                await self.sendMessage(chat_id, 'All torrents have been stopped')
+            return
+
         if msg['text'] == '/start_torrent' or 'start' in msg['text']:
             keyboard = self.get_torrents_for_select(action='start')
             await self.sendMessage(chat_id, 'Select a torrent to start', reply_markup=keyboard)
@@ -171,6 +181,13 @@ class TorrentBot(telepot.aio.Bot):
         st = os.stat(full_path)
 
         return full_path, bool(st.st_mode & stat.S_IRGRP)
+
+    @staticmethod
+    def all_torrents(action=None):
+        if action is None or action not in torrents:
+            return None
+        subprocess.call([torrents[action]])
+        return True
 
 
 teletor = TorrentBot(token=telegram_bot['token'])

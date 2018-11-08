@@ -16,7 +16,18 @@ Then you can start and stop torrents through inline buttons right from telegram.
 <img src="https://www.dropbox.com/s/j4pm5b015d6sksk/teletor_bot_commands.png?raw=1" alt="TeleTor Telegram Bot" width="700"/>
 <br /><br />
 
-Also you can add commands by editing the bot in BotFather but it's not necessary.
+Also you can add commands by editing the bot in BotFather.
+Go to BotFather -> Choose your bot -> Edit Bot -> Edit Commands
+and send this list:
+
+```bash
+list - show torrents list
+start_torrent - start a specific torrent
+stop_torrent - stop a specific torrent
+start_all - start all torrents
+stop_all - stop all torrents
+delete_torrent - delete a specific torrent
+```
 <br /><br />
 <img src="https://www.dropbox.com/s/b6nixg4ilrqtl8h/teletor_bot_set_commands.png?raw=1" alt="TeleTor Telegram Bot" width="700"/>
 <br />
