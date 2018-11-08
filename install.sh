@@ -64,9 +64,9 @@ if [[ $(check_gui) ]]
             exit 1
         fi
 
-        $(find $(pwd)/${repository}-master/scripts/ -type f -exec sed -i -e "s/username:password/${user_name}:${user_pass}/g" {} \;)
-        $(find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i '' "s/t_username: ''/t_username: '${user_name}'/g" {} \;)
-        $(find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i '' "s/t_username: ''/t_password: '${user_pass}'/g" {} \;)
+        (find $(pwd)/${repository}-master/scripts/ -type f -exec sed -i -e "s/username:password/${user_name}:${user_pass}/g" {} \;)
+        (find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i -e "s/t_username: ''/t_username: '${user_name}'/g" {} \;)
+        (find $(pwd)/${repository}-master/config/ -name config.yaml -exec sed -i -e "s/t_password: ''/t_password: '${user_pass}'/g" {} \;)
 
         (chmod +x $(pwd)/${repository}-master/start_bot $(pwd)/${repository}-master/stop_bot)
         (chmod +x $(pwd)/${repository}-master/scripts/*)
