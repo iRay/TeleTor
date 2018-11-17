@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 import os
-import re
-import stat
 import asyncio
-import subprocess
+import pickle
 import telepot
 import telepot.aio
-from pathlib import Path
 from telepot import glance
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from telepot.aio.delegate import (per_chat_id, per_callback_query_origin, create_open, pave_event_space)
 
-from config import telegram_bot, torrents, auth, favourites
-from models.message import Command
+from config import telegram_bot, torrents_cfg, favourites
+from handlers.utils import auth, check_magnet_link, download
+from handlers.message import Command
 
 
-class TorrentBot(telepot.aio.Bot):
-    def __init__(self, token=None):
-        super().__init__(token)
+class TorrentBot(telepot.aio.helper.ChatHandler):
+    def __init__(self, *args, **kwargs):
+        super(TorrentBot, self).__init__(*args, **kwargs)
+        self.prev_msg = None
+        self.is_list_task_in_progress = None
+        self.list_task = None
+        self.command = Command()
 
         self.torrent_commands = {
             'keyboard': [
-                ['torrents list ▤', 'start torrent ✓', 'stop torrent ✕'],
+                ['torrents list 📋', 'start torrent 🚀', 'stop torrent 🚫'],
             ],
             'one_time_keyboard': True,
             'resize_keyboard': True
@@ -29,168 +31,135 @@ class TorrentBot(telepot.aio.Bot):
     async def on_chat_message(self, msg):
         content_type, chat_type, chat_id = telepot.glance(msg)
 
-        if not self.auth(msg['from']):
-            await self.sendMessage(chat_id, "You're not authorized to work with this bot ¯\_(ツ)_/¯")
+        if not auth(msg['from']):
+            await self.bot.sendMessage(chat_id, "You're not authorized to work with this bot ¯\_(ツ)_/¯")
             return
 
         if 'entities' in msg:
-            message = msg['text'].strip()
-            magnet_link = Command.create('magnet_link')
-            if magnet_link.check_magnet_link(message) is not None:
-                subprocess.call(["transmission-remote", "-n",
-                                 f"{torrents['t_username']}:{torrents['t_password']}", "-a", message])
-                await self.sendMessage(chat_id, "Link has been added to the queue")
+            entities = msg['entities'].pop()
+            if entities['type'] == 'url':
+                magnet_link = msg['text'].strip()
+                if check_magnet_link(magnet_link):
+                    await self.prepare_torrent_for_download(data=magnet_link, chat_id=chat_id)
+                else:
+                    msg = "Can't process provided magnet link"
+                    await self.bot.sendMessage(chat_id, msg)
                 return
 
         if content_type == 'document':
-            torrent_file = Command.create('torrent_file')
             file_name = msg['document']['file_name']
-            file_id = await self.getFile(msg['document']['file_id'])
+            file_id = await self.bot.getFile(msg['document']['file_id'])
 
             url = f"{telegram_bot['tg_endpoint']}/" \
                    f"file/" \
                    f"bot{telegram_bot['token']}/" \
                    f"{file_id['file_path']}"
 
-            file_path = f"{torrents['files_dir']}/{file_name}"
-            torrent_file.download(url=url, path=file_path)
-            subprocess.call(["transmission-remote", "-n",
-                             f"{torrents['t_username']}:{torrents['t_password']}", "-a", file_path])
-
-            await self.sendMessage(chat_id, f"Added to the queue: {file_name}")
+            file_path = f"{os.getcwd()}/{torrents_cfg['files_dir']}/{file_name}"
+            download(url=url, path=file_path)
+            data = f"file://{file_path}"
+            await self.prepare_torrent_for_download(data=data, chat_id=chat_id)
             return
 
-        if msg['text'] == '/list' or 'list' in msg['text']:
-            await self.send_torrents_list(chat_id=chat_id)
+        switch = [
+            (lambda m: m['text'] == '/start', self.command.process_start),
+            (lambda m: m['text'] == '/start_all', self.command.process_start_all),
+            (lambda m: m['text'] == '/stop_all', self.command.process_stop_all),
+            (lambda m: m['text'] == '/start_torrent', self.command.process_start_torrent),
+            (lambda m: m['text'] == '/stop_torrent', self.command.process_stop_torrent),
+            (lambda m: m['text'] == '/delete_torrent', self.command.process_delete_torrent),
+            (lambda m: True, self.command.process_wait)
+        ]
+        for when, processor in switch:
+            if when(msg):
+                reply = await processor()
+                self.prev_msg = await self.bot.sendMessage(chat_id, reply['msg'], reply_markup=reply['reply_markup'])
+                break
 
-        if msg['text'].startswith('set'):
-            alias = re.compile('[:\s+,]').split(msg['text'].strip())
-            if alias[1] not in favourites:
-                return
-            download_dir = favourites[alias[1]]
-            path, is_writable = self.is_path_writable(download_dir)
-            if is_writable:
-                subprocess.call(["transmission-remote", "-n",
-                                 f"{torrents['t_username']}:{torrents['t_password']}", "-w", path])
-                await self.sendMessage(chat_id, f"New favourite directory {alias[1]} has been set")
-            else:
-                await self.sendMessage(chat_id, "Provided directory either isn't writable or doesn't exist\n"
-                                                "Try another one")
-            return
+        if msg['text'].startswith('start torrent'):
+            reply = await self.command.process_start_torrent()
+            self.prev_msg = await self.bot.sendMessage(chat_id, reply['msg'], reply_markup=reply['reply_markup'])
 
-        if msg['text'] == '/start':
-            await self.sendMessage(chat_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
-            return
+        if msg['text'].startswith('stop torrent'):
+            reply = await self.command.process_stop_torrent()
+            self.prev_msg = await self.bot.sendMessage(chat_id, reply['msg'], reply_markup=reply['reply_markup'])
 
-        if msg['text'] == '/start_all':
-            if self.all_torrents('start_all') is not None:
-                await self.sendMessage(chat_id, 'All torrents have been started')
-            return
+        if msg['text'] == '/list' or msg['text'].startswith('torrents list'):
+            await self.show_torrents_list(chat_id)
 
-        if msg['text'] == '/stop_all':
-            if self.all_torrents('stop_all') is not None:
-                await self.sendMessage(chat_id, 'All torrents have been stopped')
-            return
+    async def prepare_torrent_for_download(self, data, chat_id):
+        torrent = {'torrent': data}
+        with open(torrents_cfg['t_file_magnet'], 'wb') as hFile:
+            pickle.dump(torrent, hFile)
 
-        if msg['text'] == '/start_torrent' or 'start' in msg['text']:
-            keyboard = self.get_torrents_for_select(action='start')
-            await self.sendMessage(chat_id, 'Select a torrent to start', reply_markup=keyboard)
-            return
+        destination = self.command.select_download_dir()
+        await self.bot.sendMessage(chat_id, 'Please, select download destination', reply_markup=destination)
 
-        if msg['text'] == '/stop_torrent' or 'stop' in msg['text']:
-            keyboard = self.get_torrents_for_select(action='stop')
-            await self.sendMessage(chat_id, 'Select a torrent to stop', reply_markup=keyboard)
-            return
+    async def show_torrents_list(self, chat_id):
+        if self.list_task is not None:
+            self.list_task.cancel()
+        self.list_task = asyncio.create_task(self.list_progress(chat_id))
 
-        if msg['text'] == '/delete_torrent':
-            keyboard = self.get_torrents_for_select(action='delete')
-            await self.sendMessage(chat_id, 'Select a torrent to start', reply_markup=keyboard)
-            return
-
-        await self.sendMessage(chat_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
-
-    @staticmethod
-    def get_torrents_for_select(action='stop'):
-        fetched_torrents_list = subprocess.check_output([torrents['fetch_ids']])
-        list_ids = re.split('\n', fetched_torrents_list.decode('utf-8'))
-        torrents_ids = list_ids[1:-2]
-
-        torrents_out = {}
-        for id in torrents_ids:
-            torrent_name = subprocess.check_output([torrents['fetch_names'], str(id)])
-            torrents_out[id] = torrent_name.decode('utf-8').strip().strip('Name: ')
-
-        keyboard_ids = list([
-                list([
-                    InlineKeyboardButton(text=torrents_out[id], callback_data=f"{action}_{id}")
-                ]) for id in torrents_out
-            ])
-
-        keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_ids)
-
-        return keyboard
+    async def list_progress(self, chat_id: int) -> None:
+        """
+        Show realtime progress 10 times with 10sec interval
+        :param chat_id:
+        :return:
+        """
+        try:
+            prev_reply = await self.command.process_list()
+            self.prev_msg = await self.bot.sendMessage(chat_id, prev_reply['msg'])
+            for _ in range(10):
+                await asyncio.sleep(2)
+                new_reply = await self.command.process_list()
+                if new_reply == prev_reply:
+                    continue
+                edited = telepot.message_identifier(self.prev_msg)
+                self.prev_msg = await self.bot.editMessageText(edited, text=new_reply['msg'])
+                prev_reply = new_reply
+        finally:
+            self.list_task = None
 
     async def on_callback_query(self, msg):
         query_id, from_id, query_data = glance(msg, flavor='callback_query')
 
         if 'start' in query_data:
-            await self.answerCallbackQuery(query_id, text='Torrent is being started...')
-            subprocess.call([torrents['start_torrent'], query_data.strip('start_')])
-            await self.sendMessage(from_id, 'Torrent started')
-            await self.sendMessage(from_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
+            await self.bot.answerCallbackQuery(query_id, text='Torrent is being started...')
+            self.command.torrent_start(query_data.strip('start_'))
+            await self.bot.sendMessage(from_id, 'Torrent started', reply_markup=self.torrent_commands)
 
         if 'stop' in query_data:
-            await self.answerCallbackQuery(query_id, text='Torrent is being stopped...')
-            subprocess.call([torrents['stop_torrent'], query_data.strip('stop_')])
-            await self.sendMessage(from_id, 'Torrent stopped')
-            await self.sendMessage(from_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
+            await self.bot.answerCallbackQuery(query_id, text='Torrent is being stopped...')
+            self.command.torrent_stop(query_data.strip('stop_'))
+            await self.bot.sendMessage(from_id, 'Torrent stopped', reply_markup=self.torrent_commands)
 
         if 'delete' in query_data:
-            await self.answerCallbackQuery(query_id, text='Torrent is being removed...')
-            subprocess.call([torrents['delete_torrent'], query_data.strip('delete_')])
-            await self.sendMessage(from_id, 'Torrent removed')
-            await self.sendMessage(from_id, "I'm waiting for a command...", reply_markup=self.torrent_commands)
+            await self.bot.answerCallbackQuery(query_id, text='Torrent is being removed...')
+            self.command.torrent_delete(query_data.strip('delete_'))
+            await self.bot.sendMessage(from_id, 'Torrent removed', reply_markup=self.torrent_commands)
 
-    async def send_torrents_list(self, chat_id=None, message=''):
-        if chat_id is None:
-            return
-        torrents_list = self.get_torrents_list()
-        await self.sendMessage(chat_id, f"{message}\nID\t\tDone\t\tStatus\t\tName\n{torrents_list}")
+        if 'favourite' in query_data:
+            download_to = query_data.strip('favourite_')
+            with open(torrents_cfg['t_file_magnet'], 'rb') as hFile:
+                torrent = pickle.load(hFile)
+            try:
+                self.command.torrent_add(torrent['torrent'], download_dir=favourites[download_to])
+                await self.bot.sendMessage(from_id, "Link has been added to the queue", reply_markup=None)
+                await self.show_torrents_list(from_id)
+            except Exception as e:
+                await self.bot.sendMessage(from_id, e, reply_markup=None)
 
-    @staticmethod
-    def get_torrents_list():
-        fetched_torrents_list = subprocess.check_output([torrents['fetch_list']])
-        torrents_list = re.split('\n', fetched_torrents_list.decode('utf-8'))
-        without_extra_fields = torrents_list[1:-2]
-
-        status_torrents_list = '\n'.join(without_extra_fields)
-        return status_torrents_list
-
-    @staticmethod
-    def auth(user=None):
-        if not user:
-            return False
-        credentials = zip([user['id'], user['username'], user['first_name'], user['last_name']],
-                          [auth['id'], auth['username'], auth['first_name'], auth['last_name']])
-        pairs_check = [True if pair[0] == pair[1] else None for pair in credentials]
-        if all(pairs_check):
-            return True
-        return False
-
-    @staticmethod
-    def is_path_writable(path):
-        st = os.stat(path)
-        return path, bool(st.st_mode & stat.S_IRGRP)
-
-    @staticmethod
-    def all_torrents(action=None):
-        if action is None or action not in torrents:
-            return None
-        subprocess.call([torrents[action]])
-        return True
+    async def on__idle(self, event):
+        await asyncio.sleep(1)
+        self.close()
 
 
-teletor = TorrentBot(token=telegram_bot['token'])
+teletor = telepot.aio.DelegatorBot(telegram_bot['token'], [
+    pave_event_space()(
+        per_chat_id(), create_open, TorrentBot, timeout=10),
+    pave_event_space()(
+        per_callback_query_origin(), create_open, TorrentBot, timeout=10),
+])
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

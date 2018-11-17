@@ -8,9 +8,9 @@ with open(default_file, 'r') as file:
     config = yaml.safe_load(file)
 
 telegram_bot = config.get('telegram_bot')
-torrents = config.get('torrents')
+torrents_cfg = config.get('torrents')
 favourites = config.get('favourites')
-auth = config.get('auth')
+auth_cfg = config.get('auth_cfg')
 
 LOG_LEVEL_MAP = {
     'CRITICAL': logging.CRITICAL,

@@ -2,24 +2,19 @@ telegram_bot:
   tg_endpoint: 'https://api.telegram.org'
   token: ''
 
-auth:
+auth_cfg:
   id:
   username: ''
   first_name: ''
   last_name: ''
 
 torrents:
-  files_dir: './files'
+  transmission_ip: 'http://127.0.0.1'
+  transmission_port: 9091
+  files_dir: 'files'
+  t_file_magnet: 'config/torrent.pcl'
   t_username: ''
   t_password: ''
-  start_all: './scripts/start_all.sh'
-  stop_all: './scripts/stop_all.sh'
-  fetch_list: './scripts/fetch_list.sh'
-  fetch_ids: './scripts/fetch_ids.sh'
-  fetch_names: './scripts/fetch_names.sh'
-  start_torrent: './scripts/start_torrent.sh'
-  stop_torrent: './scripts/stop_torrent.sh'
-  delete_torrent: './scripts/delete_torrent.sh'
 
 # Favourites folders
 # i.e. F1 - alias that will be used in set command
@@ -28,6 +23,6 @@ torrents:
 # then /mnt/HDD/Plex/Movies directory will be used
 # as a default directory for all next downloads
 favourites:
-  F1: '/mnt/HDD/Plex/Movies'
-  F2: ''
-  F3: ''
+  Downloads: '/home/pi/Downloads'
+  Videos: '/home/pi/Videos'
+  HDDStorage: ''
