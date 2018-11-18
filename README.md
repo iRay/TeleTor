@@ -124,7 +124,7 @@ curl https://api.telegram.org/bot<BOTID>/getUpdates | python -c 'import json, sy
 Put appropriate fields that you have received into auth section of `config/config.yaml` 
 So the bot will run commands that came only from you.
 <br />auth fields in config.yaml
-<br /><img src="https://www.dropbox.com/s/qs1oitwcxuekkfr/teletor_08.png?raw=1" alt="TeleTor Telegram Bot" width="400"/>
+<br /><img src="https://www.dropbox.com/s/39f0jueo0d4er0z/teletor_config_yaml.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 ```bash
 vim TeleTor-master/config/config.yaml
