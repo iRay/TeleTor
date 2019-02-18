@@ -4,7 +4,7 @@ attrs==18.2.0
 chardet==3.0.4
 idna==2.7
 multidict==4.4.2
-PyYAML==3.13
+PyYAML>=4.2b1
 six==1.11.0
 telepot==12.7
 transmissionrpc==0.11
