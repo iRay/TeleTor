@@ -14,8 +14,8 @@ Once you've sent either torrent-file or magnet-link to the bot they will be proc
 Then you can start and stop torrents through inline buttons right from telegram.
 
 Please, check out this link to see how it works.
-<a href="https://www.dropbox.com/s/vj9liavfx9xph4x/TeleTor.gif?raw=1">TeleTor gif example</a><br /><br />
-<img src="https://www.dropbox.com/s/vj9liavfx9xph4x/TeleTor.gif?raw=1" alt="TeleTor Telegram Bot" width="550"/>
+<a href="https://preview.redd.it/w7ggdr1j8x321.gif?format=mp4&s=46532957676144d78c7af3d53bb116af9ad2db02">TeleTor gif example</a><br /><br />
+<img src="https://preview.redd.it/w7ggdr1j8x321.gif?format=mp4&s=46532957676144d78c7af3d53bb116af9ad2db02" alt="TeleTor Telegram Bot" width="550"/>
 <br /><br />
 <img src="https://www.dropbox.com/s/j4pm5b015d6sksk/teletor_bot_commands.png?raw=1" alt="TeleTor Telegram Bot" width="700"/>
 <br /><br />
