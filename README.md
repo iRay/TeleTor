@@ -31,7 +31,7 @@ stop_all - stop all torrents
 delete_torrent - delete a specific torrent
 ```
 <br /><br />
-<img src="https://www.dropbox.com/s/b6nixg4ilrqtl8h/teletor_bot_set_commands.png?raw=1" alt="TeleTor Telegram Bot" width="700"/>
+<img src="https://www.dropbox.com/s/68xs75ndaxbv7rr/teletor_commands.jpg?raw=1" alt="TeleTor Telegram Bot" width="700"/>
 <br />
 
 You can set a directory where torrents will be downloaded. Just sent to bot `set` command with a folder.
