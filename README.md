@@ -89,29 +89,27 @@ Just perform the next command on your RaspberryPi
 wget -O install https://github.com/iRay/TeleTor/raw/master/install.sh && chmod +x ./install && ./install
 ```
 
-![TeleTor Telegram Bot](https://www.dropbox.com/s/i30h0qq4woeohik/teletor_00.png?raw=1 "TeleTor Telegram Bot")
-
 After running this command you'll go through a few steps:
 Installation
-<br /><img src="https://www.dropbox.com/s/nm3px0fo4eb6jmz/teletor_01.png?raw=1" alt="TeleTor Telegram Bot" width="400"/>
+<br /><img src="https://www.dropbox.com/s/5qkrvub58xkyl59/teletor_00.jpg?raw=1" alt="TeleTor Telegram Bot" width="400"/>
 
 <br />transmission-remote username
-<br /><img src="https://www.dropbox.com/s/swp8btyhdyj327s/teletor_02.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/4g65ct2pwqdasom/teletor_01.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 <br />transmission-remote password
-<br /><img src="https://www.dropbox.com/s/gysgof1gxjvy9t3/teletor_03.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/vhdviyywigpihlm/teletor_02.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 <br />start/stop scripts
-<br /><img src="https://www.dropbox.com/s/qf0q3tgpfa7xom0/teletor_04.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/tsogahn2pfzozs6/teletor_03.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 <br />setting Bot access token
-<br /><img src="https://www.dropbox.com/s/p7t0oc480ybp2oj/teletor_05.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/bzooezd3g8itqt9/teletor_04.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 <br />installing dependencies
-<br /><img src="https://www.dropbox.com/s/vndei2e86dzwjaw/teletor_06.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/88bie5slaszux4l/teletor_07.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 <br />installation completed
-<br /><img src="https://www.dropbox.com/s/d5ntzlag2mt3avq/teletor_07.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/prwmli4omootkre/teletor_05.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 
 ## Configuration
@@ -126,7 +124,7 @@ curl https://api.telegram.org/bot<BOTID>/getUpdates | python -c 'import json, sy
 Put appropriate fields that you have received into auth section of `config/config.yaml` 
 So the bot will run commands that came only from you.
 <br />auth fields in config.yaml
-<br /><img src="https://www.dropbox.com/s/39f0jueo0d4er0z/teletor_config_yaml.png?raw=1" alt="TeleTor Telegram Bot" width="600"/>
+<br /><img src="https://www.dropbox.com/s/00dy9bcb0v0ookh/teletor_config_yaml.jpg?raw=1" alt="TeleTor Telegram Bot" width="600"/>
 
 ```bash
 vim TeleTor-master/config/config.yaml
@@ -143,6 +141,6 @@ cd TeleTor-master/ && ./start_bot
 Also you can add favourite folder with alias
 Find it in favourites section of config.yaml
 <br />
-<br /><img src="https://www.dropbox.com/s/s7paxmrntj67s5c/teletor_09.png?raw=1" alt="TeleTor Telegram Bot" width="400"/>
+<br /><img src="https://www.dropbox.com/s/5f4zb9nu09hniel/teletor_favourites.jpg?raw=1" alt="TeleTor Telegram Bot" width="400"/>
 
 About transmission-remote you can read here: [TransmissionHowTo](https://help.ubuntu.com/community/TransmissionHowTo "TransmissionHowTo")
